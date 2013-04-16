@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Knockout Paged Example</title>
+    <link rel="stylesheet" type="text/css" href="ext/bootstrap.css" />
+</head>
+<body>
+
+    <div id="test" class="container">
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>City</th>
+                    <th>Zip</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: items.pagedItems">
+                <tr>
+                    <td data-bind="text: city"></td>
+                    <td data-bind="text: zip"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <ul class="pager">
+            <li data-bind="css: {'disabled': !items.prev.enabled()}">
+                <a href="#" data-bind="click: items.prev">Previous</a>
+            </li>
+            <li data-bind="css: {'disabled': !items.next.enabled()}">
+                <a href="#" data-bind="click: items.next">Next</a>
+            </li>
+        </ul>
+
+    </div>
+
+
+
+
+
+    <script src="ext/knockout-2.2.1.js"></script>
+    <script src="knockout-paged.js"></script>
+    <script>
+        (function(){
+            // sample data
+            var data = [
+                {city:"Fort Dodge", zip:"34889"},
+                {city:"Fitchburg", zip:"83366"},
+                {city:"Menomonee Falls", zip:"52534"},
+                {city:"Norfolk", zip:"02232"},
+                {city:"Dearborn", zip:"55899"},
+                {city:"Pomona", zip:"90483"},
+                {city:"Port Orford", zip:"02565"},
+                {city:"Clovis", zip:"98500"},
+                {city:"Sister Bay", zip:"20285"},
+                {city:"Bethlehem", zip:"57757"},
+                {city:"Broken Arrow", zip:"18820"},
+                {city:"Idabel", zip:"65964"},
+                {city:"Macomb", zip:"43974"},
+                {city:"Dearborn", zip:"03451"},
+                {city:"Corinth", zip:"93401"},
+                {city:"El Paso", zip:"26282"},
+                {city:"Cortland", zip:"67010"},
+                {city:"Barre", zip:"52555"},
+                {city:"Aspen", zip:"62155"},
+                {city:"New Brunswick", zip:"68095"},
+                {city:"Garland", zip:"85242"},
+                {city:"Gloucester", zip:"33586"},
+                {city:"Beacon", zip:"21493"},
+                {city:"New Rochelle", zip:"82251"},
+                {city:"Fairbanks", zip:"66241"},
+                {city:"Lewiston", zip:"38572"},
+                {city:"Bismarck", zip:"91912"},
+                {city:"Hammond", zip:"69642"},
+                {city:"Uniontown", zip:"31508"},
+                {city:"Rolla", zip:"92430"}
+            ];
+
+            var StaticDataExample1 = function(data){
+                // stuff I care about
+                this.items = ko.observableArray(data);
+
+                // pager related stuff
+                // ---------------------------------------------
+                this.currentPage = ko.observable(1);
+                this.perPage = 10;
+                this.pagedItems = ko.computed(function(){
+                    var pg = this.currentPage(),
+                        start = this.perPage * (pg-1),
+                        end = start + this.perPage;
+                    return this.items().slice(start,end);
+                }, this);
+                this.nextPage = function(){
+                    if(this.nextPageEnabled())
+                        this.currentPage(this.currentPage()+1);
+                };
+                this.nextPageEnabled = ko.computed(function(){
+                    return this.items().length > this.perPage * this.currentPage();
+                },this);
+                this.previousPage = function(){
+                    if(this.previousPageEnabled())
+                        this.currentPage(this.currentPage()-1);
+                };
+                this.previousPageEnabled = ko.computed(function(){
+                    return this.currentPage() > 1;
+                },this);
+            };
+
+
+            var Example = function(data){
+                this.items = ko.observableArray(data).paged(10);
+            };
+
+
+            var vm = new Example(data);
+
+            ko.applyBindings(vm,document.getElementById("test"));
+
+        }());
+
+
+
+    </script>
+</body>
+</html>
