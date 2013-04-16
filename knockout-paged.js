@@ -1,11 +1,68 @@
+/*
+knockout-paged.js - A Pager Plugin for Knockout.JS
+Written By: Leland M. Richardson
+
+
+
+Desired API:
+
+    .paged(Number pageSize);
+        assumes static data, creates pager with given pageSize
+
+    .paged(Number pageSize, String url);
+        assumes `url` is an AJAX endpoint which returns the requested data with
+        url parameters "pg" and "perPage"
+
+    .paged(Object config);
+        pass config object with optional + required parameters (most flexible)
+
+
+    Object Configuration:
+    .paged({
+        pageSize: Number (10),
+        cached: Boolean (true),
+
+
+        url: String
+
+
+    });
+
+
+ */
+
+
+
 ;(function(ko){
 
     // module scope
+    var extend = ko.utils.extend;
+    var config_init = function(defaults,a,b,){
 
+        var cfg = extend({},defaults);
 
+        if(typeof a === "Number"){
+            // pageSize passed as first param
+            cfg.pageSize = a;
+        }
+        if(typeof b === "String"){
+            cfg.url = b;
+            cfg.async = true;
+        }
 
-    ko.observableArray.fn.paged = function(perPage){
+        return cfg;
+    };
+
+    var _defaults = {
+
+    };
+
+    var paged = function(a,b){
         var items = this;
+
+        //config initialization
+        var cfg = config_init(_defaults,a,b);
+
 
         items.current = ko.observable(1);
         items.perPage = perPage;
@@ -37,4 +94,9 @@
 
         return items;
     };
+
+    paged.defaultOptions = _defaults;
+
+
+
 }(ko));
