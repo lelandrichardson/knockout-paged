@@ -40,7 +40,7 @@ Desired API:
 
 
     // UTILITY METHODS
-    // ----------------------------------------------------
+    // ------------------------------------------------------------------
     var extend = ko.utils.extend;
 
     // escape regex stuff
@@ -64,8 +64,9 @@ Desired API:
     // construct url with proper data
     var construct_url = function(template,pg,pageSize){
         var start = pageSize * (pg-1),
-            end = start + pageSize;
-        return tmpl(template,{pg: pg, pageSize: pageSize, start: start, end: end});
+            end = start + pageSize,
+            data = {pg: pg, pageSize: pageSize, start: start, end: end};
+        return typeof template === 'function' ? template(data) : tmpl(template,data);
     };
 
     //constructor mapping function...
@@ -101,6 +102,10 @@ Desired API:
         return cfg;
     };
 
+
+
+    // PLUGIN DEFAULTS
+    // ----------------------------------------------------------------------
     var _defaults = {
         pageSize: 10,
         async: false, //TODO: make best guess based on other params passed?
@@ -109,7 +114,7 @@ Desired API:
         // async only options
         // --------------------------------------------
         getPage: null,
-        url: null, // TODO: allow this to be a function?
+        url: null, // this can be a string or a function ({pg: pg, pageSize: pageSize, start: start, end: end})
 
         ctor: null, //constructor to be used for
 
@@ -121,8 +126,12 @@ Desired API:
 
     };
 
+
+    // PLUGIN CONSTRUCTOR
+    // -----------------------------------------------------------------------
     var paged = function(a,b){
-        var items = this; // target observableArray
+        var items = this,
+            hasInitialData = this().length > 0; // target observableArray
 
         // config initialization
         var cfg = config_init(_defaults,a,b),
@@ -139,7 +148,7 @@ Desired API:
 
         // array of loaded
         var loaded = [true]; // set [0] to true just because.
-        if(items().length > 0){
+        if(hasInitialData){
             loaded[current()] = true;
         }
         var isLoading = ko.observable(true);
@@ -158,9 +167,7 @@ Desired API:
             } else {
                 // user has specified URL. make ajax request
                 $.ajax(extend({
-                    url: typeof cfg.url == 'function' ?
-                        cfg.url(pg,cfg.pageSize) :
-                        construct_url(cfg.url, pg, cfg.pageSize),
+                    url: construct_url(cfg.url, pg, cfg.pageSize),
                     success: function(res){
                         // allow user to apply custom mapping from server result to data to insert into array
                         if(cfg.mapFromServer){
@@ -236,7 +243,7 @@ Desired API:
         // return target
         return items;
     };
-
+    // expose default options to be changed for users
     paged.defaultOptions = _defaults;
 
     //export to knockout
