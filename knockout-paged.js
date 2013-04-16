@@ -92,19 +92,26 @@ Desired API:
 
     var _defaults = {
         pageSize: 10,
-        async: false,
+        async: false, //TODO: make best guess based on other params passed?
+
 
         // async only options
+        // --------------------------------------------
         getPage: null,
         url: null, // TODO: allow this to be a function?
-        ctor: null, //constructor to be used for
-        ajaxOptions: {},
 
+        ctor: null, //constructor to be used for
+
+        // function to be applied on "success" callback to map
+        // response to array. Signature: (Object response) -> (Array)
+        mapFromServer: null,
+        ajaxOptions: {}, //options to pass into jQuery on each request
+        cache: true
 
     };
 
     var paged = function(a,b){
-        var items = this;
+        var items = this; // target observableArray
 
         // config initialization
         var cfg = config_init(_defaults,a,b),
@@ -136,19 +143,22 @@ Desired API:
             } else {
                 // user has specified URL. make ajax request
                 $.ajax(extend({
-                    url: construct_url(cfg.url, pg, cfg.pageSize),
+                    url: typeof cfg.url == 'Function' ?
+                        cfg.url(pg,cfg.pageSize) :
+                        construct_url(cfg.url, pg, cfg.pageSize),
                     success: function(res){
-                        //todo: provide some way for user to override this
+                        // allow user to apply custom mapping from server result to data to insert into array
                         if(cfg.mapFromServer){
                             res = cfg.mapFromServer(res);
                         }
-                        onPageReceived(res);
+                        onPageReceived(pg,res);
                     }
                 },cfg.ajaxOptions));
 
             }
         } : current; // if not async, all we need to do is assign pg to current
 
+        //maps new data to underlying array
         var onPageReceived = function(pg,data){
             // if constructor passed in, map data to constructor
             if(cfg.ctor !== null){
@@ -156,6 +166,7 @@ Desired API:
             }
             // append data to items array
             Array.prototype.push.apply(items(),data);
+            if(cfg.cache) {loaded[pg] = true;}
             items.current(pg);
         };
 
@@ -193,6 +204,7 @@ Desired API:
 
     paged.defaultOptions = _defaults;
 
-
+    //export to knockout
+    ko.observableArray.fn.paged = paged;
 
 }(ko,$));
