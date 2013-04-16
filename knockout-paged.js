@@ -37,7 +37,8 @@ Desired API:
 
     // module scope
     var extend = ko.utils.extend;
-    var config_init = function(defaults,a,b,){
+
+    var config_init = function(defaults,a,b){
 
         var cfg = extend({},defaults);
 
