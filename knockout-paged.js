@@ -43,6 +43,11 @@ Desired API:
     // ----------------------------------------------------
     var extend = ko.utils.extend;
 
+    // escape regex stuff
+    var regexEscape = function(str) {
+        return (str + '').replace(/[\-#$\^*()+\[\]{}|\\,.?\s]/g, '\\$&');
+    };
+
     // simple string replacement
     var tmpl = function(str, obj) {
         for (var i in obj) {
@@ -75,16 +80,22 @@ Desired API:
 
         var cfg = extend({},defaults);
 
-        if(typeof a === "Number"){
+        if(typeof a === "number"){
             // pageSize passed as first param
             cfg.pageSize = a;
 
-            if(typeof b === "String"){
+            if(typeof b === "string"){
                 cfg.url = b;
                 cfg.async = true;
             }
         } else {
             extend(cfg,a);
+        }
+
+        // don't let user override success function... use mapFromServer instead
+        if(cfg.ajaxOptions && cfg.ajaxOptions.success){
+            console.log("'success' is not a valid ajaxOptions property.  Please look into using 'mapFromServer' instead.");
+            delete cfg.ajaxOptions.success;
         }
 
         return cfg;
@@ -123,27 +134,31 @@ Desired API:
             var pg = current(),
                 start = cfg.pageSize * (pg-1),
                 end = start + cfg.pageSize;
-            return this().slice(start,end);
-        }, items);
+            return items().slice(start,end);
+        });
 
         // array of loaded
-        var loaded = [];
+        var loaded = [true]; // set [0] to true just because.
+        if(items().length > 0){
+            loaded[current()] = true;
+        }
         var isLoading = ko.observable(true);
 
 
         // next / previous / goToPage methods
 
         var goToPage = cfg.async ? function(pg){
-            if(loaded[pg]){
+            if(cfg.cache && loaded[pg]){
                 //data is already loaded. change page in setTimeout to make async
                 isLoading(true);
                 setTimeout(function(){
                     current(pg);
+                    isLoading(false);
                 },0);
             } else {
                 // user has specified URL. make ajax request
                 $.ajax(extend({
-                    url: typeof cfg.url == 'Function' ?
+                    url: typeof cfg.url == 'function' ?
                         cfg.url(pg,cfg.pageSize) :
                         construct_url(cfg.url, pg, cfg.pageSize),
                     success: function(res){
@@ -152,6 +167,11 @@ Desired API:
                             res = cfg.mapFromServer(res);
                         }
                         onPageReceived(pg,res);
+                        isLoading(false);
+                    },
+                    complete: function() {
+                        //todo: user could override... make sure they don't?  (use compose)
+                        isLoading(false);
                     }
                 },cfg.ajaxOptions));
 
@@ -165,30 +185,38 @@ Desired API:
                 data = cmap(data,cfg.ctor);
             }
             // append data to items array
-            Array.prototype.push.apply(items(),data);
+            var start = cfg.pageSize*(pg-1);
+                data.unshift(start,0);
+
+            Array.prototype.splice.apply(items(),data);
+            items.notifySubscribers();
             if(cfg.cache) {loaded[pg] = true;}
-            items.current(pg);
+            current(pg);
         };
 
         var next = function(){
-            if(this.next.enabled())
-                goToPage(this.current()+1);
-        }.bind(items);
+            if(next.enabled())
+                goToPage(current()+1);
+        };
 
         next.enabled = ko.computed(function(){
-            return this().length > this.perPage * this.current();
-        },items);
+            //handle differently for ajax stuff
+            return true || items().length > cfg.pageSize * current();
+        });
 
         var prev = function(){
-            if(this.prev.enabled())
-                goToPage(this.current()-1);
-        }.bind(items);
+            if(prev.enabled())
+                goToPage(current()-1);
+        };
 
         prev.enabled = ko.computed(function(){
-            return this.current() > 1;
-        },items);
+            return current() > 1;
+        });
 
 
+
+        // actually go to first page
+        goToPage(current());
 
         // exported properties
         extend(items,{
@@ -196,6 +224,13 @@ Desired API:
             pagedItems: pagedItems,
             pageSize: cfg.pageSize,
             isLoading: isLoading, // might not need this if not async?
+            next: next,
+            prev: prev,
+            goToPage: goToPage,
+
+
+            cfg: cfg //might want to remove later
+
         });
 
         // return target

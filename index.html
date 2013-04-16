@@ -39,6 +39,7 @@
 
 
     <script src="ext/knockout-2.2.1.js"></script>
+    <script src="ext/jquery.min.js"></script>
     <script src="knockout-paged.js"></script>
     <script>
         (function(){
@@ -107,14 +108,14 @@
             };
 
 
-            var Example = function(data){
-                this.items = ko.observableArray(data).paged(10);
+            var Example = function(){
+                this.items = ko.observableArray().paged(10,'/test_json/pg{pg}.json');
             };
 
 
-            var vm = new Example(data);
+            window.pgvm = new Example();
 
-            ko.applyBindings(vm,document.getElementById("test"));
+            ko.applyBindings(pgvm,document.getElementById("test"));
 
         }());
 
