@@ -207,7 +207,7 @@ Desired API:
         };
 
         next.enabled = ko.computed(function(){
-            //handle differently for ajax stuff
+            //TODO: handle differently for ajax stuff
             return true || items().length > cfg.pageSize * current();
         });
 
