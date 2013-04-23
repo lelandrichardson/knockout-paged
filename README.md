@@ -1,8 +1,13 @@
-###What is returned?
 
-When calling `.paged` on a `ko.observableArray` instance, the result is the same observable array, augmented with several different paging-related properties which are added to the observableArray itself (not the underlying array).
+#Knockout-Paged.js : A Knockout Paging Plugin
 
-The following properties are added:
+##How does it work?
+
+knockout-paged.js works by extending `ko.observableArray.fn` to include a `paged` method. This method, called as a method of an instantiated `ko.observableArray`, returns the same observable array, except that it has a couple of additional propertied hanging off of it which can be used for paging.  (Note: the underlying array is not modified at all)
+
+###What are the additional properties?
+
+The following properties are added to the instance of the observable array:
 
 - `current` (*Type:* `ko.observable(Number)` ) <br/> An observable of the current page number (starting from 1)
 - `pagedItems` (*Type:* `ko.observableArray` ) <br/> An observable array containing only the items of the current page. (ie, the "paged items")
@@ -14,6 +19,11 @@ The following properties are added:
 <div></div>
 
 The paged observable array can be created by using one of the three different method signatures:
+
+
+##How do I use it?
+
+
 
 ###Page locally available data easily
 
@@ -126,20 +136,23 @@ An options hash to be passed into the jQuery <code>$.ajax</code> method when a p
     </tr>
 </table>
 
+You can see the [local data functionality demonstrated in jsFiddle here](http://jsfiddle.net/lelandrichardson/npCB5/)
 
-You can see it in action in this fiddle:
 
-<iframe style="width:100%;height:320px;" src="http://jsfiddle.net/lelandrichardson/r9f2r/embedded/result,js,html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+You can see the [asynchronous functionality demonstrated in jsFiddle here](http://jsfiddle.net/lelandrichardson/r9f2r/)
 
-<br/>
 Unfortunately, the source had to be hacked a little bit in order to work with jsFiddle's JSON echo API, but it demonstrates the asynchronous nature of the pager that can be achieved.  If I get a bit further with this project, I will provide some more complete examples and update this article.
+
+
+There is also a tutorial on Tech.Pro which was the origin of this plugin:
+
+[Handling Paged Datasets in Knockout.js](http://tech.pro/tutorial/1235/handling-paged-datasets-in-knockoutjs "Handling Paged Datasets in Knockout.js")
+
 
 
 ##Future Development
 
 As this is a plugin that I believe I myself will use, I would like to keep improving on it.  I am open to suggestions on the best way to do that.  If you have opinions on how this API should change or be improved, please share! (or submit a pull request).
-
-I have the source available on [GitHub: lelandrichardson/knockout-paged][4]
 
 My major plans for it right now (other than fixing bugs and making it more robust) is to add support for RESTful endpoints.
 

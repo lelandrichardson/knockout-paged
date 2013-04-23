@@ -109,7 +109,7 @@
 
 
             var Example = function(){
-                this.items = ko.observableArray().paged(10,'/test_json/pg{pg}.json');
+                this.apples = ko.observableArray().paged(10,'/api/get-apples?pageNumber={pg}&pageSize={pageSize}');
             };
 
 

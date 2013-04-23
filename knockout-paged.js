@@ -17,6 +17,7 @@ Desired API:
         pass config object with optional + required parameters (most flexible)
 
     //todo: perhaps some "inf-scroll" type functionality?
+    //todo: restful configuration?
 
     Object Configuration:
     .paged({
@@ -39,7 +40,7 @@ Desired API:
     // module scope
 
 
-    // UTILITY METHODS
+    // UTILITY METHODSextend
     // ------------------------------------------------------------------
     var extend = ko.utils.extend;
 
@@ -124,6 +125,8 @@ Desired API:
         ajaxOptions: {}, //options to pass into jQuery on each request
         cache: true
 
+
+
     };
 
 
@@ -157,9 +160,9 @@ Desired API:
         // next / previous / goToPage methods
 
         var goToPage = cfg.async ? function(pg){
+            isLoading(true);
             if(cfg.cache && loaded[pg]){
                 //data is already loaded. change page in setTimeout to make async
-                isLoading(true);
                 setTimeout(function(){
                     current(pg);
                     isLoading(false);
@@ -170,10 +173,14 @@ Desired API:
                     url: construct_url(cfg.url, pg, cfg.pageSize),
                     success: function(res){
                         // allow user to apply custom mapping from server result to data to insert into array
+                        var results;
                         if(cfg.mapFromServer){
-                            res = cfg.mapFromServer(res);
+                            results = cfg.mapFromServer(res);
+                        } else {
+                            //todo: check to see if res.data or res.items or something...
+                            results = res;
                         }
-                        onPageReceived(pg,res);
+                        onPageReceived(pg,results);
                         isLoading(false);
                     },
                     complete: function() {
@@ -236,7 +243,7 @@ Desired API:
             goToPage: goToPage,
 
 
-            cfg: cfg //might want to remove later
+            __paged_cfg: extend({},cfg) //might want to remove later
 
         });
 
