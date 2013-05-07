@@ -227,13 +227,16 @@ Desired API:
             return current() > 1;
         });
 
-
+        var clearCache = function(){
+            loaded = [false];
+        };
 
         // actually go to first page
         goToPage(current());
 
         // exported properties
         extend(items,{
+            clearCache: clearCache,
             current: current,
             pagedItems: pagedItems,
             pageSize: cfg.pageSize,

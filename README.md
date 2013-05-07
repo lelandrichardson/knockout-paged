@@ -16,6 +16,7 @@ The following properties are added to the instance of the observable array:
 - `next` (method) <br/> If enabled, loads the next page.
 - `previous` (method) <br/> If enabled, loads the previous page.
 - `goToPage` (method(`Number`)) <br/> Goes to the designated page. (Indexed starting at 1)
+- `clearCache` (method) <br/> Clears the cache (for ajax-based pagination)
 <div></div>
 
 The paged observable array can be created by using one of the three different method signatures:
