@@ -40,7 +40,7 @@
     // module scope
 
 
-    // UTILITY METHODSextend
+    // UTILITY METHODS
     // ------------------------------------------------------------------
     var extend = ko.utils.extend;
 
