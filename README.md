@@ -175,3 +175,8 @@ RESTful API's have an entirely different way of handling paged datasets, which i
   [2]: http://jsfiddle.net/lelandrichardson/BnYMW/
   [3]: https://github.com/lelandrichardson/knockout-paged
   [4]: https://github.com/lelandrichardson/knockout-paged
+
+
+##License
+
+MIT license - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
