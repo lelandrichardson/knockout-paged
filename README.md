@@ -1,9 +1,8 @@
-
 #Knockout-Paged.js : A Knockout Paging Plugin
 
 ##How does it work?
 
-knockout-paged.js works by extending `ko.observableArray.fn` to include a `paged` method. This method, called as a method of an instantiated `ko.observableArray`, returns the same observable array, except that it has a couple of additional propertied hanging off of it which can be used for paging.  (Note: the underlying array is not modified at all)
+knockout-paged.js works by extending `ko.observableArray.fn` to include an `asPaged` method. This method, called as a method of an instantiated `ko.observableArray`, returns the same observable array, except that it has a couple of additional propertied hanging off of it which can be used for paging.  (Note: the underlying array is not modified at all)
 
 ###What are the additional properties?
 
@@ -29,15 +28,15 @@ The paged observable array can be created by using one of the three different me
 ###Page locally available data easily
 
     // data is already loaded on the client
-    .paged(Number pageSize) => ko.observableArray (self)
+    .asPaged(Number pageSize) => ko.observableArray (self)
     
 - `pageSize` : A `Number` (Integer expected) indicating the desired page size for the observable array
-- **returns** : The `ko.observableArray` instance that `.paged` was called on, augmented with the paging methods
+- **returns** : The `ko.observableArray` instance that `.asPaged` was called on, augmented with the paging methods
 
 Example:
 
     var ExampleViewModel = function(){
-        this.apples = ko.observableArray().paged(10);
+        this.apples = ko.observableArray().asPaged(10);
         
         //... data can be loaded at any time
         this.apples.push({type: 'Jazz', state: 'Ripe'});
@@ -49,18 +48,18 @@ Example:
 ###Page server-side dataset with Url Template
 
     // data is to be loaded via ajax, with a regular URL structure
-    .paged(Number pageSize, String templateUrl) => ko.observableArray (self)
+    .asPaged(Number pageSize, String templateUrl) => ko.observableArray (self)
 
 - `pageSize` : A `Number` (Integer expected) indicating the desired page size for the observable array
 - `templateUrl` : A `String` representing the URL template to be used to grab the data from the server.
-- **returns** : The `ko.observableArray` instance that `.paged` was called on, augmented with the paging methods
+- **returns** : The `ko.observableArray` instance that `.asPaged` was called on, augmented with the paging methods
     
 Example:
 
     var Example = function(){
         // apples is empty. will automatically load first page, and any other page which is requested
         // by using the provided url template
-        this.apples = ko.observableArray().paged(10,'/url/to/get/apples?page={page}&pageSize={pageSize}');
+        this.apples = ko.observableArray().asPaged(10,'/url/to/get/apples?page={page}&pageSize={pageSize}');
     };
 
 
@@ -68,7 +67,7 @@ Example:
 
 ###Configure it to do what you need with options hash
     
-    .paged(Object config) => ko.observableArray (self)
+    .asPaged(Object config) => ko.observableArray (self)
 
 In this case we simply pass in an object hash with whatever options we want to set.  The following options are made available:
 
@@ -162,7 +161,7 @@ My thoughts is this could go something like this:
     var Example = function(){
         // instead of providing a url template, you would simply provide the resource name 
         // and it would do the rest of the work
-        this.apples = ko.observableArray().paged({
+        this.apples = ko.observableArray().asPaged({
             pageSize: 10,
             resource: '/apple'
         });
