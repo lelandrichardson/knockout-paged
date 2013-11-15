@@ -144,6 +144,14 @@
 
         // current page
             current = ko.observable(1),
+            
+            totalPages = ko.computed(function () {
+                if (items().length > 0 && cfg.pageSize > 0) {
+                    return Math.ceil(items().length / cfg.pageSize);
+                } else {
+                    return 1;
+                }
+            }),
 
             pagedItems = ko.computed(function () {
                 var pg = current(),
@@ -256,6 +264,7 @@
         extend(items, {
             current: current,
             pagedItems: pagedItems,
+            totalPages: totalPages,
             pageSize: cfg.pageSize,
             isLoading: isLoading, // might not need this if not async?
             next: next,
